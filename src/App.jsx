@@ -1,60 +1,61 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import { FruitsData } from './StoreItems'
 
 function App() {
-  // const [count, setCount] = useState(0)
-
+    //copying data from a list of items Available in Mall to display and make changes
   const [Fruit, setFruits] = useState(FruitsData);
 
+  //Increasing the Quantity of Particular Item
   const increaseQuantity = (id) => {
     setFruits(Fruit.map(fruit =>
       fruit.id === id ? { ...fruit, quantity: fruit.quantity + 1 } : fruit
-    ));
-
+    ))
   };
 
+  //decreasing quantity
   const decreaseQuantity = (id) => {
     setFruits(Fruit.map(fruit =>
       fruit.id === id && fruit.quantity > 0 ? { ...fruit, quantity: fruit.quantity - 1 } : fruit
     ))
-  }
+  };
 
+  //getting items to add in cart by customer 
   const [cart, setcartItems] = useState([]);
 
   const handleCartAddOn = (id) => {
 
+    //If cart has the item and user deselect it then it will removed
     if (cart.includes(Fruit[id - 1].id)) {
-      setcartItems(cart.filter(item => item !== id))
-
+      setcartItems(cart.filter(item => item !== id));
     }
+    //adding items in cart as per user selection
     else {
       setcartItems([...cart, Fruit[id - 1].id]);
-      console.log(cart)
-
+      // console.log(cart); this was done to get some error occured in cart
     }
-  }
+  };
 
+  //getting total bill of customer
   const [sum, setBill] = useState(0);
-  const billCalc = () => {
-    let total = 0;
-    cart.forEach(item => {
-      total += Fruit[item - 1].price * Fruit[item - 1].quantity;
+ //this method call automatically whenever the changes is made in cart or whole stock
+  useEffect(() => {
+      let total = 0;
+      Fruit.map(item => {
+    if(cart.includes(item.id)){
+      total += item.price *item.quantity;
+    }
     });
     setBill(total);
-
-    console.log(sum)
-  };
-  
+  },[cart , Fruit]);
+ 
 
   return (
     <>
       <div>
         <h3>Shoping Cart</h3>
-
-
 
         <table>
           <thead>
@@ -104,11 +105,11 @@ function App() {
                 </td>
 
               </tr>
-
-            )
-            )}
+          )
+          )}
             <tr>
-              <td><button onClick={() => billCalc()}>Bill</button></td>
+              <td>Total Bill </td>
+              <td colSpan={3}><strong>{sum}</strong></td>
             </tr>
           </tbody>
         </table>
